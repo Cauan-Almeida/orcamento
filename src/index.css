@@ -424,43 +424,101 @@ tfoot {
 }
 
 .cliente-data p {
-  margin: 0.375rem 0;
-  font-size: 0.9375rem;
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.cliente-data strong {
+  display: inline-block;
+  min-width: 80px;
+  font-weight: 600;
 }
 
 .items-table-container {
   margin: 1rem 0;
 }
 
+/* Estilos simplificados da tabela */
 .items-table {
   width: 100%;
   border-collapse: collapse;
-  border: 1px solid #e5e7eb;
+  table-layout: fixed;
 }
 
 .items-table th {
-  background-color: #f9fafb;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  padding: 0.75rem;
-  border: 1px solid #e5e7eb;
+  transform: rotate(0deg) !important;
+  letter-spacing: normal !important;
+  text-orientation: unset !important;
+  vertical-align: middle !important;
+  padding: 10px !important;
+  font-weight: bold !important;
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  background-color: #2980b9 !important;
+  color: white !important;
+  word-wrap: normal !important;
 }
 
-.items-table td {
-  padding: 0.75rem;
+.items-table tbody td {
+  padding: 8px;
   border: 1px solid #e5e7eb;
-  font-size: 0.9375rem;
+  vertical-align: middle;
+  background-color: white;
 }
 
-.total-row {
-  background-color: #f9fafb;
-  font-weight: 700;
+/* Redefinir alinhamentos específicos */
+.items-table th:first-child,
+.items-table td:first-child {
+  text-align: center !important;
+}
+
+.items-table th:nth-child(2),
+.items-table td:nth-child(2) {
+  text-align: left !important;
+}
+
+.items-table th:nth-child(3),
+.items-table td:nth-child(3) {
+  text-align: center !important;
+}
+
+.items-table th:nth-child(4),
+.items-table th:nth-child(5),
+.items-table td:nth-child(4),
+.items-table td:nth-child(5) {
+  text-align: right !important;
+}
+
+.items-table th:last-child,
+.items-table td:last-child {
+  text-align: center !important;
+}
+
+/* Estilos para a linha de total */
+.total-row td[colspan="4"] {
+  text-align: right !important;
+  font-weight: bold;
 }
 
 .total-value {
   color: #2563EB;
+  text-align: right !important;
+  font-weight: bold;
   font-size: 1.125rem;
+  position: relative;
+}
+
+.total-value::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #f9fafb;
+  z-index: -1;
 }
 
 .no-items {
@@ -518,6 +576,23 @@ tfoot {
   margin-bottom: 1rem;
 }
 
+@media (min-width: 768px) {
+  .buttons-container {
+    flex-direction: row;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+  
+  .buttons-container .btn {
+    min-width: 180px;
+  }
+  
+  .btn-large {
+    padding: 12px 24px;
+    font-size: 1.1rem;
+  }
+}
+
 @media (max-width: 767px) {
   .buttons-container {
     flex-direction: column;
@@ -538,6 +613,7 @@ tfoot {
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
   overflow: hidden;
+  width: 100%;
 }
 
 .preco-prefix {
@@ -554,4 +630,396 @@ tfoot {
   border: none;
   flex: 1;
   border-radius: 0;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+}
+
+/* Seção do Money Input no BudgetItemForm */
+.money-input-container {
+  display: flex;
+  align-items: center;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Melhorias para tabelas em dispositivos móveis */
+@media (max-width: 767px) {
+  .items-table {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+  }
+  
+  .items-table th {
+    transform: none !important;
+    writing-mode: horizontal-tb !important;
+    text-orientation: mixed !important;
+    display: table-cell !important;
+    white-space: normal !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+    padding: 5px !important;
+  }
+  
+  .items-table-container {
+    margin: 0.5rem -1rem;
+    padding: 0 1rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Esconder o botão remover na visualização de impressão */
+  @media print {
+    .items-table .btn-danger {
+      display: none;
+    }
+  }
+}
+
+/* Estilos para o componente TelefoneInput */
+.telefone-input-container {
+  position: relative;
+  margin-bottom: 0.25rem;
+}
+
+.error-message {
+  color: #dc2626;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+.input-error {
+  border-color: #dc2626;
+}
+
+/* Estilos para o histórico de orçamentos */
+.orcamentos-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.orcamento-item {
+  padding: 0.75rem;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.orcamento-item:hover {
+  background-color: #f3f4f6;
+}
+
+.orcamento-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.orcamento-item-id {
+  font-weight: 600;
+  color: #1F2937;
+}
+
+.orcamento-item-data {
+  color: #6B7280;
+  font-size: 0.75rem;
+}
+
+.orcamento-item-cliente {
+  color: #4B5563;
+}
+
+.orcamento-item-valor {
+  color: #2563EB;
+  font-weight: 500;
+}
+
+.historico-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.historico-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Ajuste para detalhes do item no PDF */
+.pdf-descricao-detalhes {
+  margin-top: 5px;
+  padding-top: 5px;
+  border-top: 1px dashed #e5e7eb;
+  font-size: 0.85em;
+  color: #6b7280;
+}
+
+.item-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.item-descricao {
+  font-weight: 500;
+}
+
+.item-detalhes {
+  color: #6b7280;
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+/* Estilos para o conteúdo vertical da tabela */
+.items-table th span,
+.items-table td span {
+  white-space: nowrap;
+  display: inline-block;
+}
+
+/* Corrigir a formatação da coluna de Total */
+.total-row td[colspan="4"] {
+  text-align: right;
+  padding-right: 10px;
+}
+
+/* Garantir que todos textos da tabela fiquem horizontais */
+.items-table th,
+.items-table td {
+  transform: none !important;
+  writing-mode: horizontal-tb !important;
+}
+
+/* Corrigir cabeçalhos verticais na tabela */
+.items-table th {
+  writing-mode: initial !important;
+  text-orientation: initial !important;
+  letter-spacing: normal !important;
+  white-space: normal !important;
+}
+
+.items-table th span {
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  white-space: nowrap !important;
+  transform: none !important;
+  display: block !important;
+  width: 100% !important;
+}
+
+.items-table td:nth-child(3),
+.items-table th:nth-child(3) {
+  width: 60px !important;
+  min-width: 60px !important;
+  max-width: 60px !important;
+}
+
+/* Garantir que o Item apareça na horizontal */
+.items-table th:first-child span {
+  transform: none !important;
+  display: inline-block !important;
+  writing-mode: horizontal-tb !important;
+  text-orientation: mixed !important;
+  white-space: nowrap !important;
+  text-align: center;
+  width: 100%;
+}
+
+/* Classes para corrigir cada coluna da tabela */
+.col-item {
+  width: 50px !important;
+  min-width: 50px !important;
+  max-width: 50px !important;
+  word-break: normal !important;
+  text-align: center !important;
+  white-space: normal !important;
+}
+
+.col-descricao {
+  width: auto !important;
+  text-align: left !important;
+  white-space: normal !important;
+}
+
+.col-qtd {
+  width: 60px !important;
+  min-width: 60px !important;
+  max-width: 60px !important;
+  text-align: center !important;
+  white-space: normal !important;
+}
+
+.col-preco, .col-subtotal {
+  width: 100px !important;
+  min-width: 100px !important;
+  max-width: 100px !important;
+  text-align: center !important;
+  white-space: normal !important;
+}
+
+.col-acoes {
+  width: 100px !important;
+  min-width: 100px !important;
+  max-width: 100px !important;
+  text-align: center !important;
+  white-space: normal !important;
+}
+
+/* Garantindo que todos os elementos da tabela estejam corretamente orientados */
+.items-table,
+.items-table thead,
+.items-table tbody,
+.items-table tfoot,
+.items-table tr,
+.items-table th,
+.items-table td {
+  transform: none !important;
+  writing-mode: unset !important;
+  text-orientation: unset !important;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  text-indent: 0 !important;
+  text-align: start !important;
+  white-space: normal !important;
+  transform-origin: none !important;
+  word-break: normal !important;
+}
+
+.items-table td {
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  font-size: 0.9375rem;
+  vertical-align: middle;
+  background-color: white;
+}
+
+/* Remover os estilos anteriores que podem estar causando problemas */
+.items-table * {
+  transform: none !important;
+}
+
+/* Remover as classes anteriores potencialmente conflitantes */
+.items-table th span,
+.items-table th div {
+  transform: none !important;
+  display: inline !important;
+  font-weight: 600 !important;
+  white-space: normal !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+.header-row th {
+  color: white !important;
+  font-weight: bold !important;
+  text-align: center !important;
+  vertical-align: middle !important;
+  background-color: #2980b9 !important;
+  border: 1px solid #e5e7eb !important;
+  padding: 10px !important;
+  transform: none !important;
+  white-space: normal !important;
+  word-wrap: normal !important;
+  word-break: normal !important;
+  line-height: 1.2 !important;
+}
+
+/* Remover todos os estilos de tabela antigos que causam problemas */
+.items-table,
+.items-table th,
+.items-table td,
+.header-row th,
+.col-item,
+.col-descricao,
+.col-qtd,
+.col-preco,
+.col-subtotal,
+.col-acoes {
+  writing-mode: unset !important;
+  text-orientation: unset !important;
+  transform: none !important;
+  letter-spacing: normal !important;
+  white-space: normal !important;
+}
+
+/* Estilo para o conteúdo dos itens */
+.item-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.item-descricao {
+  font-weight: 500;
+}
+
+.item-detalhes {
+  color: #6b7280;
+  font-style: italic;
+  font-size: 0.9em;
+}
+
+@media (min-width: 1200px) {
+  .container, .app-container {
+    max-width: 1400px;
+    padding: 0 40px;
+  }
+  .card {
+    padding: 40px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .form-actions {
+    justify-content: flex-end;
+  }
+}
+
+/* Layout responsivo - versão final e definitiva */
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: stretch;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .app-container {
+    padding: 0 30px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-container {
+    padding: 0 40px;
+  }
+  
+  .card {
+    padding: 30px;
+  }
+  
+  .form-actions {
+    justify-content: flex-end;
+  }
+}
+
+@media (min-width: 1200px) {
+  .card {
+    padding: 40px;
+  }
 }
