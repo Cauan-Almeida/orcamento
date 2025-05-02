@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { Cliente, Item, Orcamento, Empresa } from '../types';
+import { Cliente, Orcamento, Empresa } from '../types';
+import { ItemOrcamento } from '../types';
 import BudgetItemForm from '../components/BudgetItemForm';
 import { generatePDF } from '../utils/pdfGenerator';
 
@@ -45,7 +46,7 @@ const NewBudget = () => {
   };
 
   const [cliente, setCliente] = useState<Cliente>({ nome: '' });
-  const [itens, setItens] = useState<Item[]>([]);
+  const [itens, setItens] = useState<ItemOrcamento[]>([]);
   const [observacoes, setObservacoes] = useState('');
   const [empresa, setEmpresa] = useState<Empresa>(getSavedEmpresa());
   const [mostrarConfiguracoes, setMostrarConfiguracoes] = useState(false);
@@ -75,7 +76,7 @@ const NewBudget = () => {
     setEmpresa((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAddItem = (item: Item) => {
+  const handleAddItem = (item: ItemOrcamento) => {
     setItens((prev) => [...prev, item]);
   };
 
@@ -83,7 +84,7 @@ const NewBudget = () => {
     setItens((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const calcularSubtotal = (item: Item) => {
+  const calcularSubtotal = (item: ItemOrcamento) => {
     return item.quantidade * item.precoUnitario;
   };
 
@@ -104,7 +105,7 @@ const NewBudget = () => {
     // Salvar o orçamento na lista
     setOrcamentos(prev => [...prev, orcamento]);
     
-    generatePDF(orcamento, orcamentoRef.current);
+    generatePDF(orcamento, null);
   };
 
   const handleEnviarWhatsApp = () => {
@@ -148,7 +149,7 @@ const NewBudget = () => {
       }
 
       // Gerar o PDF e enviar por email usando mailto do Gmail
-      await generatePDF(orcamento, orcamentoRef.current, false);
+      await generatePDF(orcamento, null);
       
       const total = calcularTotal().toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
       const assunto = encodeURIComponent(`Orçamento ${numeroOrcamento.current} - ${empresa.nome}`);
@@ -180,7 +181,7 @@ const NewBudget = () => {
   };
 
   const formatarMoeda = (valor: number) => {
-    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    return `R$ ${valor.toString().replace('.', ',')}`;
   };
 
   const limparFormulario = () => {
@@ -311,7 +312,7 @@ const NewBudget = () => {
       </div>
       
       {/* Adicionar Itens */}
-      <BudgetItemForm onAddItem={handleAddItem} />
+      <BudgetItemForm onSubmit={handleAddItem} />
       
       {/* Visualização do Orçamento */}
       <div 
@@ -357,43 +358,53 @@ const NewBudget = () => {
             <p className="no-items">Nenhum item adicionado</p>
           ) : (
             <div className="items-table-container">
-              <table className="items-table">
-                <thead>
-                  <tr>
-                    <th>Tipo</th>
-                    <th>Descrição</th>
-                    <th className="text-right">Qtd.</th>
-                    <th className="text-right">Preço Unit.</th>
-                    <th className="text-right">Subtotal</th>
-                    <th></th>
+              <table border={1} cellPadding={10} cellSpacing={0} style={{width: '100%', borderCollapse: 'collapse'}}>
+                <tr style={{backgroundColor: '#2980b9', color: 'white'}}>
+                  <td width="60" align="center">Item</td>
+                  <td align="left">Descrição</td>
+                  <td width="60" align="center">Qtd.</td>
+                  <td width="100" align="right">Preço Unit.</td>
+                  <td width="100" align="right">Subtotal</td>
+                  <td width="100" align="center">Ações</td>
+                </tr>
+                {itens.map((item, index) => (
+                  <tr key={item.id}>
+                    <td align="center">{index + 1}</td>
+                    <td align="left">
+                      <div className="item-content">
+                        <span className="item-descricao">{item.descricao}</span>
+                        {item.detalhes && <span className="item-detalhes"> - {item.detalhes}</span>}
+                      </div>
+                    </td>
+                    <td align="center">{item.quantidade}</td>
+                    <td align="right">{formatarMoeda(item.precoUnitario)}</td>
+                    <td align="right">{formatarMoeda(calcularSubtotal(item))}</td>
+                    <td align="center">
+                      <button 
+                        onClick={() => handleRemoveItem(item.id)}
+                        className="btn btn-danger"
+                      >
+                        Remover
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {itens.map((item) => (
-                    <tr key={item.id}>
-                      <td>{item.tipo}</td>
-                      <td>{item.descricao}</td>
-                      <td className="text-right">{item.quantidade}</td>
-                      <td className="text-right">{formatarMoeda(item.precoUnitario)}</td>
-                      <td className="text-right">{formatarMoeda(calcularSubtotal(item))}</td>
-                      <td>
-                        <button 
-                          onClick={() => handleRemoveItem(item.id)}
-                          className="btn btn-danger"
-                        >
-                          Remover
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr className="total-row">
-                    <td colSpan={4} className="text-right">TOTAL:</td>
-                    <td className="text-right total-value">{formatarMoeda(calcularTotal())}</td>
-                    <td></td>
-                  </tr>
-                </tfoot>
+                ))}
+                <tr style={{borderTop: '2px solid #e5e7eb'}}>
+                  <td colSpan={4} align="right"><strong>TOTAL:</strong></td>
+                  <td align="right" style={{position: 'relative'}}>
+                    <div style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: '#f9fafb',
+                      zIndex: -1
+                    }}></div>
+                    <span style={{color: '#2563EB', fontWeight: 'bold'}}>{formatarMoeda(calcularTotal())}</span>
+                  </td>
+                  <td></td>
+                </tr>
               </table>
             </div>
           )}
@@ -420,7 +431,7 @@ const NewBudget = () => {
         <button
           onClick={handleGerarPDF}
           disabled={itens.length === 0 || !cliente.nome}
-          className="btn btn-success"
+          className="btn btn-success btn-large"
         >
           <span className="mr-2">📄</span> Gerar PDF
         </button>
@@ -428,7 +439,7 @@ const NewBudget = () => {
         <button
           onClick={handleEnviarWhatsApp}
           disabled={itens.length === 0 || !cliente.nome || !cliente.whatsapp}
-          className="btn btn-success"
+          className="btn btn-success btn-large"
         >
           <span className="mr-2">📱</span> Enviar por WhatsApp
         </button>
@@ -436,7 +447,7 @@ const NewBudget = () => {
         <button
           onClick={handleEnviarEmail}
           disabled={itens.length === 0 || !cliente.nome || !cliente.email}
-          className="btn btn-success"
+          className="btn btn-success btn-large"
         >
           <span className="mr-2">📧</span> Enviar por Gmail
         </button>
