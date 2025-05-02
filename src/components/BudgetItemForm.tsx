@@ -1,121 +1,171 @@
-import { useState } from 'react';
-import { Item, ItemTipo } from '../types';
-import { v4 as uuidv4 } from 'uuid';
+import { useState, useEffect } from 'react';
+import { ItemOrcamento } from '../types';
+import MoneyInput from './MoneyInput';
 
-type BudgetItemFormProps = {
-  onAddItem: (item: Item) => void;
-};
+interface BudgetItemFormProps {
+  onSubmit: (item: ItemOrcamento) => void;
+  editingItem?: ItemOrcamento;
+  onUpdate?: (item: ItemOrcamento) => void;
+  onCancel?: () => void;
+}
 
-const BudgetItemForm = ({ onAddItem }: BudgetItemFormProps) => {
-  const [tipo, setTipo] = useState<ItemTipo>('Produto');
+const BudgetItemForm: React.FC<BudgetItemFormProps> = ({ 
+  onSubmit, 
+  editingItem,
+  onUpdate,
+  onCancel
+}) => {
   const [descricao, setDescricao] = useState('');
+  const [detalhes, setDetalhes] = useState('');
   const [quantidade, setQuantidade] = useState(1);
-  const [precoUnitario, setPrecoUnitario] = useState<string>('');
+  const [precoUnitario, setPrecoUnitario] = useState(0);
+  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [isEditing, setIsEditing] = useState(false);
 
-  const handlePrecoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    
-    // Permitir apenas números, vírgula ou ponto
-    if (/^(\d+)?([\.,]\d{0,2})?$/.test(value) || value === '') {
-      setPrecoUnitario(value);
+  useEffect(() => {
+    if (editingItem) {
+      setDescricao(editingItem.descricao);
+      setDetalhes(editingItem.detalhes || '');
+      setQuantidade(editingItem.quantidade);
+      setPrecoUnitario(editingItem.precoUnitario);
+      setIsEditing(true);
+    } else {
+      resetForm();
+      setIsEditing(false);
     }
+  }, [editingItem]);
+
+  const resetForm = () => {
+    setDescricao('');
+    setDetalhes('');
+    setQuantidade(1);
+    setPrecoUnitario(0);
+    setErrors({});
+  };
+
+  const validateForm = () => {
+    const newErrors: {[key: string]: string} = {};
+    
+    if (!descricao.trim()) {
+      newErrors.descricao = 'A descrição é obrigatória';
+    }
+    
+    if (quantidade <= 0) {
+      newErrors.quantidade = 'A quantidade deve ser maior que zero';
+    }
+    
+    if (precoUnitario <= 0) {
+      newErrors.precoUnitario = 'O preço unitário deve ser maior que zero';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Converter o preço com vírgula para formato numérico
-    const precoNumerico = Number(precoUnitario.replace(',', '.'));
-    
-    const novoItem: Item = {
-      id: uuidv4(),
-      tipo,
-      descricao,
-      quantidade,
-      precoUnitario: precoNumerico
-    };
-    
-    onAddItem(novoItem);
-    
-    // Resetar formulário
-    setDescricao('');
-    setQuantidade(1);
-    setPrecoUnitario('');
+    if (validateForm()) {
+      const item: ItemOrcamento = {
+        descricao: descricao.trim(),
+        detalhes: detalhes.trim() || undefined,
+        quantidade,
+        precoUnitario
+      };
+      
+      if (isEditing && onUpdate) {
+        onUpdate(item);
+      } else {
+        onSubmit(item);
+        resetForm();
+      }
+    }
   };
 
-  const precoValido = precoUnitario !== '' && Number(precoUnitario.replace(',', '.')) > 0;
+  const handleCancelEdit = () => {
+    resetForm();
+    if (onCancel) {
+      onCancel();
+    }
+  };
+
+  const handleQuantidadeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+    setQuantidade(isNaN(value) ? 0 : value);
+  };
 
   return (
-    <div className="card">
-      <h3 className="mb-4">Adicionar Item</h3>
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 grid-cols-3 mb-4">
-          <div className="form-group">
-            <label className="form-label">Tipo</label>
-            <select
-              className="form-select"
-              value={tipo}
-              onChange={(e) => setTipo(e.target.value as ItemTipo)}
-            >
-              <option value="Produto">Produto</option>
-              <option value="Serviço">Serviço</option>
-            </select>
-          </div>
-          
-          <div className="col-span-2 form-group">
-            <label className="form-label">Descrição</label>
-            <input
-              type="text"
-              className="form-input"
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              placeholder="Ex: Serviço de design, Produto X, etc."
-              required
-            />
-          </div>
+    <form onSubmit={handleSubmit} className="item-form">
+      <div className="form-row">
+        <div className="form-group">
+          <label htmlFor="descricao">Descrição *</label>
+          <input
+            id="descricao"
+            type="text"
+            value={descricao}
+            onChange={(e) => setDescricao(e.target.value)}
+            className={`form-input ${errors.descricao ? 'input-error' : ''}`}
+            placeholder="Descrição do item ou serviço"
+          />
+          {errors.descricao && <div className="error-message">{errors.descricao}</div>}
+        </div>
+      </div>
+      
+      <div className="form-row">
+        <div className="form-group">
+          <label htmlFor="detalhes">Detalhes (opcional)</label>
+          <input
+            id="detalhes"
+            type="text"
+            value={detalhes}
+            onChange={(e) => setDetalhes(e.target.value)}
+            className="form-input"
+            placeholder="Detalhes adicionais, especificações, etc."
+          />
+        </div>
+      </div>
+      
+      <div className="form-row">
+        <div className="form-group">
+          <label htmlFor="quantidade">Quantidade *</label>
+          <input
+            id="quantidade"
+            type="number"
+            min="1"
+            value={quantidade}
+            onChange={handleQuantidadeChange}
+            className={`form-input ${errors.quantidade ? 'input-error' : ''}`}
+          />
+          {errors.quantidade && <div className="error-message">{errors.quantidade}</div>}
         </div>
         
-        <div className="grid grid-cols-1 grid-cols-2 mb-4">
-          <div className="form-group">
-            <label className="form-label">Quantidade</label>
-            <input
-              type="number"
-              min="1"
-              className="form-input"
-              value={quantidade}
-              onChange={(e) => setQuantidade(Number(e.target.value))}
-              required
-            />
-          </div>
-          
-          <div className="form-group">
-            <label className="form-label">Preço Unitário (R$)</label>
-            <div className="preco-input-container">
-              <div className="preco-prefix">R$</div>
-              <input
-                type="text"
-                className="form-input preco-input"
-                value={precoUnitario}
-                onChange={handlePrecoChange}
-                placeholder="0,00"
-                required
-              />
-            </div>
-            <small className="block mt-1 text-gray-500">Use vírgula ou ponto para decimais</small>
-          </div>
+        <div className="form-group">
+          <label htmlFor="precoUnitario">Preço Unitário *</label>
+          <MoneyInput
+            value={precoUnitario}
+            onChange={setPrecoUnitario}
+            placeholder="0,00"
+          />
+          {errors.precoUnitario && <div className="error-message">{errors.precoUnitario}</div>}
+          <div className="help-text">Formato: R$ 0,00</div>
         </div>
-        
-        <div className="mt-4 flex justify-end">
-          <button
-            type="submit"
-            className="btn btn-primary"
-            disabled={!descricao || quantidade < 1 || !precoValido}
+      </div>
+      
+      <div className="form-actions">
+        <button type="submit" className="btn btn-primary">
+          {isEditing ? 'Atualizar Item' : 'Adicionar Item'}
+        </button>
+        {isEditing && (
+          <button 
+            type="button" 
+            className="btn btn-secondary"
+            onClick={handleCancelEdit}
           >
-            Adicionar Item
+            Cancelar
           </button>
-        </div>
-      </form>
-    </div>
+        )}
+      </div>
+    </form>
   );
 };
 
