@@ -1,303 +1,222 @@
 import './App.css';
+import './styles/DarkTheme.css';
 import { useState, useEffect } from 'react';
-import ClientForm from './components/ClientForm';
-import Budget from './components/Budget';
-import { Orcamento, Cliente, ItemOrcamento, Empresa } from './types';
-import { v4 as uuidv4 } from 'uuid';
-import { generatePDF } from './utils/pdfGenerator';
-import BudgetHistory from './pages/BudgetHistory';
-import CompanyConfig from './components/CompanyConfig';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faHistory, faFileInvoice, faCog } from '@fortawesome/free-solid-svg-icons';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './firebase';
+import { configurarSite } from './utils/siteConfig';
+import { ConfigProvider } from './context/ConfigContext';
 
-function App() {
-  const [cliente, setCliente] = useState<Cliente>({ nome: '', telefone: '', email: '' });
-  const [itens, setItens] = useState<ItemOrcamento[]>([]);
-  const [observacoes, setObservacoes] = useState('');
-  const [showHistoryPage, setShowHistoryPage] = useState(false);
-  const [showCompanyConfig, setShowCompanyConfig] = useState(false);
-  const [transitionClass, setTransitionClass] = useState('');
-  const [empresa, setEmpresa] = useState<Empresa>({
-    nome: 'Empresa Exemplo',
-    cnpj: '00.000.000/0001-00',
-    telefone: '(00) 0000-0000',
-    email: 'contato@empresa.com',
-    endereco: 'Rua Exemplo, 123 - Cidade - UF'
-  });
+// Componentes
+import HomePage from './components/HomePage';
+import Login from './components/login';
+import Cadastro from './components/Cadastro';
+import Dashboard from './components/Dashboard';
+import OrcamentoDetail from './components/OrcamentoDetail';
+import NewBudget from './pages/NewBudget';
+import UserProfile from './components/UserProfile';
+import Configuracoes from './components/Configuracoes';
+import PaginaEmConstrucao from './components/PaginaEmConstrucao';
 
-  // Carregar dados salvos no localStorage ao iniciar
+// Configurar o título e favicon do site
+configurarSite();
+
+// Componente para rotas protegidas
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
-    // Carregar dados do cliente
-    const savedCliente = localStorage.getItem('lastCliente');
-    if (savedCliente) {
-      try {
-        setCliente(JSON.parse(savedCliente));
-      } catch (e) {
-        console.error('Erro ao carregar cliente:', e);
+    console.log('ProtectedRoute: Verificando autenticação...');
+    
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      const isAuthenticated = !!user;
+      console.log('ProtectedRoute: Status de autenticação:', isAuthenticated, user?.uid);
+      setAuthenticated(isAuthenticated);
+      setLoading(false);
+      
+      if (!isAuthenticated) {
+        // Se não estiver autenticado, redireciona imediatamente
+        console.log('ProtectedRoute: Não autenticado, redirecionando para login');
+        navigate('/login');
       }
-    }
+    });
 
-    // Carregar dados da empresa
-    const savedEmpresa = localStorage.getItem('dadosEmpresa');
-    if (savedEmpresa) {
-      try {
-        setEmpresa(JSON.parse(savedEmpresa));
-      } catch (e) {
-        console.error('Erro ao carregar dados da empresa:', e);
-      }
-    }
+    return () => {
+      unsubscribe();
+    };
+  }, [navigate]);
+
+  if (loading) {
+    console.log('ProtectedRoute: Carregando...');
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Carregando...</p>
+      </div>
+    );
+  }
+
+  if (!authenticated) {
+    // Este trecho raramente será executado devido ao redirecionamento no useEffect
+    console.log('ProtectedRoute: Não autenticado (renderização)');
+    return null;
+  }
+
+  console.log('ProtectedRoute: Autenticado, renderizando conteúdo protegido');
+  return <>{children}</>;
+};
+
+// Componente para rota não encontrada
+const NotFoundRoute = () => {
+  const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setAuthenticated(!!user);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const handleClienteSubmit = (clienteData: Cliente) => {
-    setCliente(clienteData);
-    localStorage.setItem('lastCliente', JSON.stringify(clienteData));
-  };
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Carregando...</p>
+      </div>
+    );
+  }
 
-  const handleEmpresaSubmit = (empresaData: Empresa) => {
-    setEmpresa(empresaData);
-    localStorage.setItem('dadosEmpresa', JSON.stringify(empresaData));
-    setShowCompanyConfig(false);
-  };
+  // Se estiver autenticado, redireciona para o dashboard
+  // Se não estiver autenticado, redireciona para a home
+  return authenticated ? <Navigate to="/dashboard" /> : <Navigate to="/" />;
+};
 
-  const handleItensChange = (novosItens: ItemOrcamento[]) => {
-    setItens(novosItens);
-  };
-
-  const handleObservacoesChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setObservacoes(e.target.value);
-  };
-
-  // Função para salvar orçamento no histórico/localStorage
-  const salvarOrcamentoNoHistorico = () => {
-    if (!cliente.nome || itens.length === 0) {
-      alert('Por favor, preencha os dados do cliente e adicione pelo menos um item ao orçamento.');
-      return false;
-    }
-
-    const dataAtual = new Date();
-    const anoAtual = dataAtual.getFullYear();
-    const contadorKey = `orcamento_contador_${anoAtual}`;
-    let orcamentosAntigos = localStorage.getItem('orcamentos');
-    let proximoNumero = 1;
-
-    if (orcamentosAntigos) {
-      try {
-        const orcamentos = JSON.parse(orcamentosAntigos);
-        const orcamentosDoAnoAtual = orcamentos.filter((orc: Orcamento) => {
-          const dataOrc = new Date(orc.data);
-          return dataOrc.getFullYear() === anoAtual;
-        });
-        if (orcamentosDoAnoAtual.length > 0) {
-          proximoNumero = orcamentosDoAnoAtual.reduce((max: number, orc: Orcamento) => {
-            const numeroOrcamento = orc.numeroOrcamento;
-            if (numeroOrcamento) {
-              const partes = numeroOrcamento.split('/');
-              if (partes.length === 2) {
-                const num = parseInt(partes[1], 10);
-                return num > max ? num : max;
-              }
-            }
-            return max;
-          }, 0) + 1;
-        }
-      } catch (e) {
-        const savedContador = localStorage.getItem(contadorKey);
-        if (savedContador) {
-          proximoNumero = parseInt(savedContador, 10) + 1;
-        }
-      }
-    }
-
-    const numeroFormatado = `${anoAtual}/${proximoNumero.toString().padStart(3, '0')}`;
-    localStorage.setItem(contadorKey, proximoNumero.toString());
-
-    const novoOrcamento: Orcamento = {
-      id: uuidv4(),
-      numeroOrcamento: numeroFormatado,
-      cliente,
-      itens,
-      observacoes,
-      data: dataAtual,
-      empresa
-    };
-
-    let orcamentos = [];
-    if (orcamentosAntigos) {
-      try {
-        orcamentos = JSON.parse(orcamentosAntigos);
-      } catch (e) {}
-    }
-    orcamentos.push(novoOrcamento);
-    localStorage.setItem('orcamentos', JSON.stringify(orcamentos));
-    return true;
-  };
-
-  const limparFormulario = () => {
-    if (window.confirm('Tem certeza que deseja limpar todos os dados do formulário?')) {
-      setItens([]);
-      setObservacoes('');
-    }
-  };
-
-  const handleSelectBudget = (orcamento: Orcamento) => {
-    setCliente(orcamento.cliente);
-    setItens(orcamento.itens);
-    setObservacoes(orcamento.observacoes || '');
-    setShowHistoryPage(false);
-  };
-
-  const toggleHistoryPage = () => {
-    if (!showHistoryPage) {
-      // Mostrar a página de histórico com animação
-      setTransitionClass('slide-in');
-      setShowHistoryPage(true);
-      setShowCompanyConfig(false);
-    } else {
-      // Esconder a página de histórico com animação
-      setTransitionClass('slide-out');
-      setTimeout(() => {
-        setShowHistoryPage(false);
-      }, 300); // Tempo da animação
-    }
-  };
-
-  const toggleCompanyConfig = () => {
-    if (!showCompanyConfig) {
-      setShowCompanyConfig(true);
-      setShowHistoryPage(false);
-    } else {
-      setShowCompanyConfig(false);
-    }
-  };
-
+function App() {
+  // Efeito para garantir que o favicon seja atualizado sempre que o componente montar
+  useEffect(() => {
+    configurarSite();
+  }, []);
+  
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <h1>Gerador de Orçamentos</h1>
-        <div className="header-buttons">
-          <button 
-            className="btn btn-secondary"
-            onClick={toggleCompanyConfig}
-            title="Configurações da empresa"
-          >
-            <FontAwesomeIcon icon={faCog} /> Empresa
-          </button>
-          <button 
-            className="btn btn-secondary"
-            onClick={toggleHistoryPage}
-            title="Ver histórico de orçamentos"
-          >
-            <FontAwesomeIcon icon={faHistory} /> Histórico
-          </button>
-        </div>
-      </header>
-
-      {showHistoryPage ? (
-        <div className={`history-container ${transitionClass}`}>
-          <BudgetHistory 
-            onSelectBudget={handleSelectBudget} 
-            onClose={toggleHistoryPage} 
+    <ConfigProvider>
+      <Router>
+        <Routes>
+          {/* Rotas públicas */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/cadastro" element={<Cadastro />} />
+          
+          {/* Rotas protegidas */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
           />
-        </div>
-      ) : showCompanyConfig ? (
-        <div className="company-config-container">
-          <CompanyConfig 
-            empresa={empresa} 
-            onSubmit={handleEmpresaSubmit} 
-            onCancel={() => setShowCompanyConfig(false)} 
+          
+          <Route 
+            path="/orcamentos/:id" 
+            element={
+              <ProtectedRoute>
+                <OrcamentoDetail />
+              </ProtectedRoute>
+            } 
           />
-        </div>
-      ) : (
-        <div className="main-content">
-          <div className="form-section">
-            <h2>Dados do Cliente</h2>
-            <ClientForm cliente={cliente} onSubmit={handleClienteSubmit} />
-          </div>
-
-          <div className="budget-section">
-            <h2>Orçamento</h2>
-            <Budget 
-              itens={itens} 
-              observacoes={observacoes}
-              onItensChange={handleItensChange} 
-              onObservacoesChange={handleObservacoesChange} 
-            />
-          </div>
-
-          <div className="actions-section">
-            <button className="btn btn-primary btn-large" onClick={() => {
-              if (salvarOrcamentoNoHistorico()) {
-                alert('Orçamento salvo com sucesso!');
-                setItens([]);
-                setObservacoes('');
-              }
-            }}>
-              <FontAwesomeIcon icon={faFileInvoice} /> Salvar Orçamento
-            </button>
-            <button className="btn btn-success btn-large" onClick={() => {
-              if (salvarOrcamentoNoHistorico()) {
-                const orcamentos = JSON.parse(localStorage.getItem('orcamentos') || '[]');
-                const ultimoOrcamento = orcamentos[orcamentos.length - 1];
-                generatePDF(ultimoOrcamento, () => {
-                  if (window.confirm('PDF gerado e orçamento salvo! Deseja limpar o formulário para criar um novo orçamento?')) {
-                    setItens([]);
-                    setObservacoes('');
-                  }
-                });
-              }
-            }}>
-              <FontAwesomeIcon icon={faFileInvoice} /> Gerar PDF
-            </button>
-            <button className="btn btn-danger" onClick={limparFormulario}>
-              Limpar Formulário
-            </button>
-            <button
-              className="btn btn-success"
-              onClick={() => {
-                if (!cliente.telefone) {
-                  alert('Preencha o telefone do cliente!');
-                  return;
-                }
-                const telefone = cliente.telefone.replace(/\D/g, '');
-                const mensagem = encodeURIComponent(
-                  `Olá ${cliente.nome}, segue o detalhamento do seu orçamento:\n\n` +
-                  itens.map((item, idx) =>
-                    `${idx + 1}. ${item.descricao} - Qtd: ${item.quantidade}`
-                  ).join('\n') +
-                  `\n\nObservações: ${observacoes || '-'}\n\nAtenciosamente,\n${empresa.nome}`
-                );
-                window.open(`https://wa.me/55${telefone}?text=${mensagem}`, '_blank');
-              }}
-              disabled={itens.length === 0 || !cliente.nome || !cliente.telefone}
-            >
-              <FontAwesomeIcon icon={faFileInvoice} /> Enviar orçamento por WhatsApp
-            </button>
-            <button
-              className="btn btn-success"
-              onClick={() => {
-                if (!cliente.email) {
-                  alert('Preencha o e-mail do cliente!');
-                  return;
-                }
-                const destinatario = cliente.email;
-                const assunto = encodeURIComponent('Orçamento solicitado');
-                const corpo = encodeURIComponent(
-                  `Olá ${cliente.nome},\n\nSegue o detalhamento do seu orçamento:\n\n` +
-                  itens.map((item, idx) =>
-                    `${idx + 1}. ${item.descricao} - Qtd: ${item.quantidade}`
-                  ).join('\n') +
-                  `\n\nObservações: ${observacoes || '-'}\n\nAtenciosamente,\n${empresa.nome}`
-                );
-                window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=${destinatario}&su=${assunto}&body=${corpo}`, '_blank');
-              }}
-              disabled={itens.length === 0 || !cliente.nome || !cliente.email}
-            >
-              <FontAwesomeIcon icon={faFileInvoice} /> Enviar orçamento por Gmail
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+          
+          <Route 
+            path="/orcamentos/:id/editar" 
+            element={
+              <ProtectedRoute>
+                <NewBudget />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/novo-orcamento" 
+            element={
+              <ProtectedRoute>
+                <NewBudget />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/novo-orcamento/:id" 
+            element={
+              <ProtectedRoute>
+                <NewBudget />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/perfil" 
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Rotas ainda não implementadas totalmente */}
+          <Route 
+            path="/orcamentos" 
+            element={
+              <ProtectedRoute>
+                <PaginaEmConstrucao 
+                  titulo="Área de Orçamentos" 
+                  descricao="Gerencie todos os seus orçamentos em um só lugar. Em breve você poderá filtrar, exportar e criar novos modelos de orçamentos."
+                />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/clientes" 
+            element={
+              <ProtectedRoute>
+                <PaginaEmConstrucao 
+                  titulo="Gerenciamento de Clientes" 
+                  descricao="Visualize, adicione e gerencie seus clientes. Em breve você poderá importar contatos e criar grupos de clientes."
+                />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/produtos" 
+            element={
+              <ProtectedRoute>
+                <PaginaEmConstrucao 
+                  titulo="Catálogo de Produtos" 
+                  descricao="Gerencie seu catálogo de produtos e serviços. Em breve você poderá incluir fotos e categorias personalizadas."
+                />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/configuracoes" 
+            element={
+              <ProtectedRoute>
+                <Configuracoes />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Redirecionar rotas não encontradas baseado na autenticação */}
+          <Route path="*" element={<NotFoundRoute />} />
+        </Routes>
+      </Router>
+    </ConfigProvider>
   );
 }
 

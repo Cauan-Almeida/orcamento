@@ -1,7 +1,10 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-import { Orcamento } from '../types';
+import { Orcamento, Cliente } from '../types';
 import autoTable from 'jspdf-autotable';
+import { doc, addDoc, collection } from 'firebase/firestore';
+import { db } from '../firebase';
+import { getDocs, query, where, orderBy, limit } from 'firebase/firestore';
 
 // Função para gerar o número sequencial do orçamento no formato AAAA/NNN
 const gerarNumeroOrcamento = (data: Date): string => {
@@ -44,7 +47,136 @@ const formatarTelefone = (telefone: string): string => {
   }
 };
 
-export const generatePDF = (orcamento: Orcamento, callback: (() => void) | null) => {
+// Função para salvar orçamento no Firestore
+export const salvarOrcamentoFirestore = async (userId: string, orcamento: Orcamento) => {
+  try {
+    // Primeiro, verificamos se o orçamento já tem um ID do Firestore
+    if (orcamento.firestoreId) {
+      // Se já tem, atualizamos o documento existente
+      await doc(db, "users", userId, "orcamentos", orcamento.firestoreId);
+      return orcamento.firestoreId;
+    } else {
+      // Se não tem, criamos um novo documento
+      const valorTotal = orcamento.itens.reduce((total, item) => {
+        // Usar precoUnitario se valorUnitario não estiver disponível
+        const valor = item.valorUnitario || item.precoUnitario;
+        return total + (valor * item.quantidade);
+      }, 0);
+
+      const docRef = await addDoc(collection(db, "users", userId, "orcamentos"), {
+        numeroOrcamento: orcamento.numeroOrcamento,
+        cliente: orcamento.cliente,
+        itens: orcamento.itens,
+        observacoes: orcamento.observacoes,
+        data: orcamento.data,
+        empresa: orcamento.empresa,
+        valorTotal: valorTotal,
+        status: 'Pendente',
+        dataCriacao: new Date(),
+        userId: userId
+      });
+      return docRef.id;
+    }
+  } catch (error) {
+    console.error("Erro ao salvar orçamento no Firestore:", error);
+    throw error;
+  }
+};
+
+// Função para buscar clientes do usuário
+export const buscarClientes = async (userId: string): Promise<Cliente[]> => {
+  try {
+    // Verificar primeiro se já temos os clientes em cache no localStorage
+    const cachedClientsKey = `cached_clients_${userId}`;
+    const cachedClients = localStorage.getItem(cachedClientsKey);
+    
+    if (cachedClients) {
+      try {
+        // Usar os clientes em cache se disponíveis e se o cache não tiver mais de 1 hora
+        const { clients, timestamp } = JSON.parse(cachedClients);
+        const oneHourAgo = Date.now() - (60 * 60 * 1000);
+        
+        if (timestamp > oneHourAgo) {
+          console.log("Usando clientes em cache");
+          return clients;
+        }
+      } catch (e) {
+        console.error("Erro ao ler clientes do cache:", e);
+      }
+    }
+    
+    const clientesSet = new Set<string>();
+    
+    // Buscar apenas 10 orçamentos mais recentes para extrair clientes únicos
+    const orcamentosRef = collection(db, "users", userId, "orcamentos");
+    const q = query(orcamentosRef, orderBy("dataCriacao", "desc"), limit(10));
+    const querySnapshot = await getDocs(q);
+    
+    const clientes: Cliente[] = [];
+    querySnapshot.forEach((doc) => {
+      const orcamento = doc.data();
+      const clienteNome = orcamento.cliente.nome;
+      
+      // Verificar se este cliente já foi adicionado
+      if (!clientesSet.has(clienteNome)) {
+        clientesSet.add(clienteNome);
+        clientes.push({
+          nome: clienteNome,
+          telefone: orcamento.cliente.telefone,
+          email: orcamento.cliente.email
+        });
+      }
+    });
+    
+    // Salvar no cache do localStorage
+    localStorage.setItem(cachedClientsKey, JSON.stringify({
+      clients: clientes,
+      timestamp: Date.now()
+    }));
+    
+    return clientes;
+  } catch (error) {
+    console.error("Erro ao buscar clientes:", error);
+    
+    // Em caso de erro, tentar usar o cache, mesmo que seja antigo
+    try {
+      const cachedClientsKey = `cached_clients_${userId}`;
+      const cachedClients = localStorage.getItem(cachedClientsKey);
+      if (cachedClients) {
+        const { clients } = JSON.parse(cachedClients);
+        return clients;
+      }
+    } catch (e) {
+      console.error("Não foi possível recuperar clientes do cache:", e);
+    }
+    
+    return [];
+  }
+};
+
+// Função para buscar orçamentos de um cliente
+export const buscarOrcamentosDoCliente = async (userId: string, nomeCliente: string): Promise<any[]> => {
+  try {
+    const orcamentosRef = collection(db, "users", userId, "orcamentos");
+    const q = query(orcamentosRef, where("cliente.nome", "==", nomeCliente));
+    const querySnapshot = await getDocs(q);
+    
+    const orcamentos: any[] = [];
+    querySnapshot.forEach((doc) => {
+      orcamentos.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+    
+    return orcamentos;
+  } catch (error) {
+    console.error("Erro ao buscar orçamentos do cliente:", error);
+    throw error;
+  }
+};
+
+export const generatePDF = async (orcamento: Orcamento, userId: string | null, callback: (() => void) | null) => {
   // Criar uma nova instância do jsPDF
   const pdf = new jsPDF({
     orientation: 'portrait',
@@ -391,6 +523,16 @@ export const generatePDF = (orcamento: Orcamento, callback: (() => void) | null)
       pageHeight - 3,
       { align: 'center' }
     );
+  }
+
+  // Salvar no Firestore se tiver um usuário logado
+  if (userId) {
+    try {
+      const orcamentoId = await salvarOrcamentoFirestore(userId, orcamento);
+      console.log("Orçamento salvo no Firestore com ID:", orcamentoId);
+    } catch (error) {
+      console.error("Erro ao salvar orçamento:", error);
+    }
   }
 
   // Após gerar todo o conteúdo, garantir rodapé correto em todas as páginas
