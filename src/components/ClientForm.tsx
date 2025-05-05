@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Cliente } from '../types';
-import PhoneInput from './PhoneInput';
+import TelefoneInput from './TelefoneInput';
 
 interface ClientFormProps {
   cliente: Cliente;
@@ -68,9 +68,10 @@ const ClientForm: React.FC<ClientFormProps> = ({ cliente, onSubmit }) => {
       
       <div className="form-group">
         <label htmlFor="telefone">Telefone</label>
-        <PhoneInput
+        <TelefoneInput
           value={telefone}
           onChange={handlePhoneChange}
+          name="telefone"
           placeholder="(00) 00000-0000"
         />
       </div>

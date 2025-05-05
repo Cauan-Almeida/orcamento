@@ -1,0 +1,104 @@
+/* Estilos para o tema escuro */
+body.dark-theme {
+  --primary-color: #4e7bff;
+  --primary-dark: #375fd9;
+  --secondary-color: #f8f9fa;
+  --accent-color: #65d8f5;
+  --text-color: #e9ecef;
+  --text-light: #ced4da;
+  --text-muted: #adb5bd;
+  --background-light: #343a40;
+  --background-dark: #212529;
+  --gray-light: #495057;
+  --border-color: #495057;
+  --white: #2b3035;
+  --green: #40e583;
+  --yellow: #ffb74d;
+  --red: #ff6b6b;
+  --blue: #63b3ed;
+  --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  
+  background-color: #212529;
+  color: var(--text-color);
+}
+
+body.dark-theme .dashboard-header,
+body.dark-theme .dashboard-sidebar,
+body.dark-theme .config-container,
+body.dark-theme .stat-card,
+body.dark-theme .data-table th,
+body.dark-theme .empty-state,
+body.dark-theme .client-card {
+  background-color: var(--white);
+  color: var(--text-color);
+}
+
+body.dark-theme .dashboard-nav a,
+body.dark-theme .user-dropdown a,
+body.dark-theme .user-dropdown button {
+  color: var(--text-light);
+}
+
+body.dark-theme .dashboard-nav li.active a {
+  color: var(--primary-color);
+}
+
+body.dark-theme .dashboard-nav a:hover,
+body.dark-theme .user-dropdown a:hover,
+body.dark-theme .user-dropdown button:hover {
+  background-color: var(--gray-light);
+}
+
+body.dark-theme .user-name,
+body.dark-theme .data-table,
+body.dark-theme .client-info h3 {
+  color: var(--text-color);
+}
+
+body.dark-theme .data-table td {
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-light);
+}
+
+body.dark-theme .btn-secondary {
+  background-color: var(--gray-light);
+  color: var(--text-light);
+}
+
+body.dark-theme .btn-secondary:hover {
+  background-color: #6c757d;
+}
+
+body.dark-theme .feature-soon {
+  background-color: var(--background-dark);
+  color: var(--text-muted);
+}
+
+body.dark-theme .config-group select,
+body.dark-theme .config-group input[type="text"],
+body.dark-theme .config-group input[type="number"] {
+  background-color: var(--background-dark);
+  border-color: var(--border-color);
+  color: var(--text-color);
+}
+
+body.dark-theme .slider {
+  background-color: #495057;
+}
+
+body.dark-theme input:checked + .slider {
+  background-color: var(--primary-color);
+}
+
+/* Inversão de cores para ícones e elementos visuais */
+body.dark-theme .loading-spinner {
+  border: 3px solid var(--gray-light);
+  border-top: 3px solid var(--primary-color);
+}
+
+/* Estilos especiais para tooltips em tema escuro */
+body.dark-theme [title]:hover::after {
+  background-color: var(--background-dark);
+  color: var(--text-light);
+  border-color: var(--border-color);
+} 

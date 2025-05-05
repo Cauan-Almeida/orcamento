@@ -10,55 +10,20 @@ interface InputMoedaProps {
 const InputMoeda: React.FC<InputMoedaProps> = ({
   value: propValue,
   onChange,
-  placeholder = 'R$ 0,00',
+  placeholder = 'Digite o valor',
   className = '',
 }) => {
   // Estado interno do componente
   const [displayValue, setDisplayValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
-  const [isFormatting, setIsFormatting] = useState(false);
 
-  // Formatar valor completo para o padrão brasileiro (usado apenas no onBlur)
-  const formatarValorCompleto = (valor: string): string => {
-    if (!valor) return '';
-    
-    // Remove todos os caracteres não numéricos, exceto vírgula
-    let numeroLimpo = valor.replace(/[^\d,]/g, '');
-    
-    // Substitui múltiplas vírgulas por uma única
-    numeroLimpo = numeroLimpo.replace(/,+/g, ',');
-    
-    // Se não tiver vírgula, assume zero casas decimais
-    if (!numeroLimpo.includes(',')) {
-      numeroLimpo += ',00';
-    } else {
-      // Garante até duas casas decimais após a vírgula
-      const [inteiro, decimal] = numeroLimpo.split(',');
-      if (decimal.length > 2) {
-        numeroLimpo = `${inteiro},${decimal.substring(0, 2)}`;
-      } else if (decimal.length === 1) {
-        numeroLimpo = `${inteiro},${decimal}0`;
-      }
-    }
-    
-    // Adiciona separadores de milhar
-    let [parteInteira, parteDecimal] = numeroLimpo.split(',');
-    
-    // Se tiver parteInteira vazia, use 0
-    if (!parteInteira) parteInteira = '0';
-    
-    // Adiciona pontos como separadores de milhar
-    parteInteira = parteInteira.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    
-    return `${parteInteira},${parteDecimal}`;
-  };
-
-  // Converte string formatada para número
+  // Converte string para número
   const converterParaNumero = (texto: string): number => {
     if (!texto) return 0;
     
+    // Permite tanto ponto quanto vírgula como separador decimal
     const valorLimpo = texto
-      .replace(/\./g, '')
+      .replace(/[^\d.,]/g, '')
       .replace(',', '.');
     
     return parseFloat(valorLimpo) || 0;
@@ -66,14 +31,11 @@ const InputMoeda: React.FC<InputMoedaProps> = ({
 
   // Inicializa o valor exibido com base na propriedade value
   useEffect(() => {
-    if (propValue !== undefined && !isFormatting) {
-      const formatted = propValue.toLocaleString('pt-BR', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-      setDisplayValue(formatted);
+    if (propValue !== undefined) {
+      // Mantém o valor como string para preservar a forma que o usuário digitou
+      setDisplayValue(propValue.toString().replace('.', ','));
     }
-  }, [propValue, isFormatting]);
+  }, [propValue]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -84,16 +46,17 @@ const InputMoeda: React.FC<InputMoedaProps> = ({
       return;
     }
     
-    // Simplesmente atualiza o estado com o valor digitado
+    // Atualiza o estado com o valor digitado sem formatação
     setDisplayValue(value);
     
     // Notifica o componente pai se fornecido
     if (onChange) {
-      onChange(converterParaNumero(value));
+      const valorNumerico = converterParaNumero(value);
+      onChange(valorNumerico);
     }
   };
 
-  // Formata apenas quando o input perde o foco
+  // Apenas converte o valor para número quando o input perde o foco
   const handleBlur = () => {
     if (!displayValue) {
       if (onChange) {
@@ -102,14 +65,10 @@ const InputMoeda: React.FC<InputMoedaProps> = ({
       return;
     }
     
-    setIsFormatting(true);
-    const valorFormatado = formatarValorCompleto(displayValue);
-    setDisplayValue(valorFormatado);
-    
     if (onChange) {
-      onChange(converterParaNumero(valorFormatado));
+      const valorNumerico = converterParaNumero(displayValue);
+      onChange(valorNumerico);
     }
-    setIsFormatting(false);
   };
 
   return (
@@ -121,7 +80,7 @@ const InputMoeda: React.FC<InputMoedaProps> = ({
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder={placeholder}
-        className="input-moeda"
+        className="form-input"
       />
     </div>
   );

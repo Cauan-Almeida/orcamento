@@ -25,7 +25,7 @@ const TelefoneInput: React.FC<TelefoneInputProps> = ({
     if (value !== inputValue) {
       setInputValue(value);
     }
-  }, [value]);
+  }, [value, inputValue]);
 
   const formatarTelefone = (telefone: string): string => {
     // Remover todos os caracteres não numéricos

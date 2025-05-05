@@ -1,0 +1,378 @@
+.orcamento-detail-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.orcamento-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.orcamento-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.orcamento-title h1 {
+  font-size: 1.8rem;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.orcamento-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.btn-secondary {
+  background-color: var(--gray-light);
+  color: var(--text-color);
+}
+
+.btn-secondary:hover {
+  background-color: #d1d6db;
+}
+
+.btn-success {
+  background-color: #25D366;
+  color: white;
+}
+
+.btn-success:hover {
+  background-color: #128C7E;
+}
+
+.btn-info {
+  background-color: #EA4335;
+  color: white;
+}
+
+.btn-info:hover {
+  background-color: #BB3325;
+}
+
+.btn-warning {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.btn-warning:hover {
+  background-color: #d97706;
+}
+
+.orcamento-content {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.orcamento-section {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.orcamento-section:last-child {
+  border-bottom: none;
+}
+
+.orcamento-section h2 {
+  font-size: 1.2rem;
+  color: var(--text-color);
+  margin-top: 0;
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.client-details {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.client-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: white;
+  flex-shrink: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.client-info {
+  flex: 1;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 0.75rem;
+  align-items: center;
+  border-bottom: 1px solid var(--gray-light);
+  padding-bottom: 0.75rem;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: var(--text-muted);
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.detail-value {
+  color: var(--text-color);
+  font-weight: 500;
+}
+
+/* Tabela de itens com layout ajustado */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #e5e7eb;
+  font-variant-numeric: tabular-nums;
+}
+
+.items-table th {
+  background-color: #2980b9;
+  color: white;
+  padding: 12px;
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid #e5e7eb;
+  position: relative;
+}
+
+.items-table td {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  vertical-align: middle;
+  text-align: center;
+}
+
+/* Ajuste definitivo: Valor Unitário com largura fixa, demais colunas flexíveis */
+.items-table th:first-child,
+.items-table td:first-child {
+  width: 38%;
+  text-align: left;
+}
+
+.items-table th:nth-child(2),
+.items-table td:nth-child(2) {
+  width: 12%;
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+.items-table th:nth-child(3),
+.items-table td:nth-child(3) {
+  width: 120px !important;
+  min-width: 120px !important;
+  max-width: 120px !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.items-table th:nth-child(4),
+.items-table td:nth-child(4) {
+  width: auto;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.items-table th,
+.items-table td {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.items-table td.valor-cell,
+.valor-formatado {
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+  text-align: center !important;
+}
+
+.valor-formatado {
+  display: inline-block !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.2px !important;
+  font-feature-settings: "tnum" !important;
+  font-variant-numeric: tabular-nums !important;
+  padding: 0 2px !important;
+}
+
+/* Estilo do rodapé */
+.items-table tfoot {
+  background-color: #f8f9fa;
+}
+
+.items-table tfoot td {
+  font-weight: bold;
+}
+
+.total-label {
+  text-align: right;
+  padding-right: 15px;
+  font-weight: 600;
+}
+
+.total-value {
+  color: #2563eb;
+  font-weight: 700;
+  white-space: nowrap !important;
+  text-align: center !important;
+  padding-right: 10px !important;
+}
+
+.observacoes-box {
+  background-color: var(--background-light);
+  padding: 1rem;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  color: var(--text-color);
+}
+
+.error-container {
+  max-width: 600px;
+  margin: 5rem auto;
+  text-align: center;
+  padding: 2rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.error-container h2 {
+  color: #e74c3c;
+  margin-bottom: 1rem;
+}
+
+.error-container p {
+  margin-bottom: 2rem;
+  color: var(--text-light);
+}
+
+/* Ajustes para telas pequenas */
+@media (max-width: 768px) {
+  .orcamento-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .orcamento-actions {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .orcamento-section {
+    padding: 1rem;
+  }
+
+  .table-responsive {
+    margin: 0 -1rem;
+    width: calc(100% + 2rem);
+    padding: 0 1rem;
+  }
+
+  .items-table {
+    min-width: 550px;
+  }
+  
+  .items-table th,
+  .items-table td {
+    padding: 8px;
+    font-size: 0.9rem;
+  }
+  
+  .valor-cell,
+  .total-value {
+    font-size: 0.9rem;
+  }
+}
+
+/* Estilo específico para seção de informações adicionais */
+.orcamento-section.info-adicionais {
+  background-color: var(--background-light);
+  padding: 1.5rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+}
+
+.orcamento-section.info-adicionais .detail-row {
+  background-color: var(--white);
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.orcamento-section.info-adicionais h2 {
+  margin-bottom: 1.5rem;
+}
+
+/* Adicionar mais espaço para valores maiores */
+.items-table th:nth-child(3),
+.items-table th:nth-child(4) {
+  text-align: center !important;
+  padding-right: 12px;
+}
+
+/* Centralizar todas as colunas da tabela de itens do orçamento */
+.items-table td {
+  text-align: center !important;
+}
+
+/* Manter valores monetários centralizados */
+.items-table td.valor-cell,
+.valor-formatado,
+.items-table td:nth-child(3),
+.items-table td:nth-child(4) {
+  text-align: center !important;
+  white-space: nowrap !important;
+} 

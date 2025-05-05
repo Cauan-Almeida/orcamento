@@ -1,0 +1,132 @@
+.navbar {
+  background-color: #fff;
+  height: 70px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 20px;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.logo-text {
+  color: #0f172a;
+  font-size: 24px;
+  font-weight: 700;
+  margin-right: 8px;
+}
+
+.logo-highlight {
+  color: #4361ee;
+  background-color: #03203C;
+  padding: 2px 4px;
+  border-radius: 4px;
+  color: white;
+}
+
+.logo-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+.logo-img {
+  width: 100%;
+  height: 100%;
+}
+
+.nav-menu {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  height: 70px;
+}
+
+.nav-link {
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 0 15px;
+  height: 100%;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #4361ee;
+  border-bottom: 2px solid #4361ee;
+}
+
+.nav-cta {
+  display: flex;
+  align-items: center;
+}
+
+.nav-button {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  padding: 8px 16px;
+  height: 100%;
+  border-radius: 4px;
+  font-weight: 500;
+  margin-left: 8px;
+  transition: all 0.2s ease;
+}
+
+.nav-button.login {
+  color: #4361ee;
+  background-color: transparent;
+  border: 1px solid #4361ee;
+}
+
+.nav-button.login:hover {
+  background-color: rgba(67, 97, 238, 0.1);
+}
+
+.nav-button.signup {
+  color: white;
+  background-color: #4361ee;
+  border: 1px solid #4361ee;
+}
+
+.nav-button.signup:hover {
+  background-color: #3153e9;
+}
+
+@media screen and (max-width: 768px) {
+  .nav-menu {
+    display: none;
+  }
+  
+  .navbar-container {
+    justify-content: space-between;
+  }
+} 
