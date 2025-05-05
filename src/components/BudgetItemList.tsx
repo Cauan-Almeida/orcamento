@@ -1,6 +1,7 @@
 import { ItemOrcamento } from '../types';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useConfig } from '../context/ConfigContext';
 
 interface BudgetItemListProps {
   itens: ItemOrcamento[];
@@ -13,9 +14,14 @@ const BudgetItemList: React.FC<BudgetItemListProps> = ({
   onEditItem, 
   onDeleteItem 
 }) => {
-  // Formatar valor como moeda brasileira
+  const { config } = useConfig();
+
+  // Formatar valor como moeda conforme configurações
   const formatarMoeda = (valor: number) => {
-    return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    return new Intl.NumberFormat(config.idioma, { 
+      style: 'currency', 
+      currency: config.formatoMonetario || 'BRL'
+    }).format(valor);
   };
 
   if (itens.length === 0) {

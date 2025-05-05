@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ItemOrcamento } from '../types';
-import MoneyInput from './MoneyInput';
+import InputMoeda from './InputMoeda';
 
 interface BudgetItemFormProps {
   onSubmit: (item: ItemOrcamento) => void;
@@ -142,7 +142,7 @@ const BudgetItemForm: React.FC<BudgetItemFormProps> = ({
         
         <div className="form-group">
           <label htmlFor="precoUnitario">Preço Unitário *</label>
-          <MoneyInput
+          <InputMoeda
             value={precoUnitario}
             onChange={setPrecoUnitario}
             placeholder="0,00"

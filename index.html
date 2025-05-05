@@ -2,12 +2,53 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <!-- Meta tags de segurança e compatibilidade -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="unsafe-none" />
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="unsafe-none" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React + TS</title>
+    <meta name="theme-color" content="#4361ee" />
+    <meta name="description" content="Sistema para criação e gerenciamento de orçamentos profissionais" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/FAVEICON-USE.png?v=4" />
+    <link rel="shortcut icon" type="image/png" href="/images/FAVEICON-USE.png?v=4" />
+    <link rel="apple-touch-icon" href="/images/FAVEICON-USE.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <title>Orçamento PRO</title>
+    <script>
+      // Força o navegador a recarregar o favicon
+      document.addEventListener('DOMContentLoaded', function() {
+        const timestamp = new Date().getTime();
+        const faviconUrl = '/images/FAVEICON-USE.png?v=' + timestamp;
+        
+        // Remove ícones existentes
+        const iconNodes = document.querySelectorAll("link[rel*='icon']");
+        iconNodes.forEach(node => {
+          if (node.parentNode) {
+            node.parentNode.removeChild(node);
+          }
+        });
+        
+        // Adiciona novos links para o favicon
+        const link = document.createElement('link');
+        link.type = 'image/png';
+        link.rel = 'icon';
+        link.href = faviconUrl;
+        document.head.appendChild(link);
+        
+        const shortcutLink = document.createElement('link');
+        shortcutLink.type = 'image/png';
+        shortcutLink.rel = 'shortcut icon';
+        shortcutLink.href = faviconUrl;
+        document.head.appendChild(shortcutLink);
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <noscript>Você precisa habilitar o JavaScript para usar este aplicativo.</noscript>
   </body>
 </html>

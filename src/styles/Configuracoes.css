@@ -1,0 +1,187 @@
+/* Estilos para a página de Configurações */
+.config-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--white);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.config-header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.config-header h1 {
+  font-size: 1.8rem;
+  color: var(--text-color);
+  margin-bottom: 0.5rem;
+}
+
+.config-header p {
+  color: var(--text-muted);
+}
+
+.config-section {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.config-section h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-color);
+}
+
+.config-group {
+  margin-bottom: 1.5rem;
+}
+
+.config-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.config-group select,
+.config-group input[type="text"],
+.config-group input[type="number"] {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  font-size: 1rem;
+  background-color: var(--white);
+}
+
+.config-group select:focus,
+.config-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+}
+
+.switch-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Estilo para interruptor (switch) */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: var(--primary-color);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px var(--primary-color);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.config-description {
+  margin-bottom: 1rem;
+  color: var(--text-muted);
+}
+
+.feature-soon {
+  background-color: var(--gray-light);
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-secondary {
+  background-color: var(--gray-light);
+  color: var(--text-color);
+}
+
+.btn-secondary:hover {
+  background-color: #d1d5db;
+}
+
+.message-bar {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.message-bar.success {
+  background-color: rgba(46, 204, 113, 0.1);
+  color: var(--green);
+}
+
+.message-bar.error {
+  background-color: rgba(231, 76, 60, 0.1);
+  color: var(--red);
+}
+
+@media (max-width: 768px) {
+  .config-container {
+    margin: 1rem;
+    padding: 1rem;
+  }
+  
+  .switch-label {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+} 

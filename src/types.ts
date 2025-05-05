@@ -19,14 +19,20 @@ export interface ItemOrcamento {
   detalhes?: string;
   quantidade: number;
   precoUnitario: number;
+  valorUnitario?: number;
 }
 
 export interface Orcamento {
   id: string;
+  firestoreId?: string;
   numeroOrcamento?: string;
   cliente: Cliente;
   itens: ItemOrcamento[];
   observacoes?: string;
   data: Date | string;
   empresa?: Empresa;
+  status?: 'Pendente' | 'Enviado' | 'Aprovado' | 'Recusado';
+  dataCriacao?: Date;
+  valorTotal?: number;
+  valor?: number;
 } 

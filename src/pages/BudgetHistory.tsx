@@ -42,7 +42,10 @@ const BudgetHistory: React.FC<BudgetHistoryProps> = ({ onSelectBudget, onClose }
   };
 
   const handleRegeneratePDF = (orcamento: Orcamento) => {
-    generatePDF(orcamento, null);
+    generatePDF(orcamento, null, () => {
+      // Callback após gerar o PDF
+      console.log('PDF gerado com sucesso');
+    });
   };
 
   const limparHistorico = () => {

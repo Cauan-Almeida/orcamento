@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="350" viewBox="0 0 500 350">
+  <!-- Fundo de papel -->
+  <rect x="50" y="30" width="400" height="290" rx="10" ry="10" fill="#fff" stroke="#ddd" stroke-width="2"/>
+  
+  <!-- Cabeçalho -->
+  <rect x="50" y="30" width="400" height="60" rx="10" ry="10" fill="#4361ee"/>
+  <text x="250" y="68" font-family="Arial" font-size="24" fill="#fff" text-anchor="middle" font-weight="bold">ORÇAMENTO</text>
+  
+  <!-- Logo -->
+  <circle cx="100" cy="60" r="20" fill="#fff"/>
+  <text x="100" y="68" font-family="Arial" font-size="20" fill="#4361ee" text-anchor="middle" font-weight="bold">OP</text>
+  
+  <!-- Número -->
+  <text x="400" y="52" font-family="Arial" font-size="12" fill="#fff" text-anchor="end">Nº 2023/001</text>
+  <text x="400" y="72" font-family="Arial" font-size="12" fill="#fff" text-anchor="end">Data: 10/12/2023</text>
+  
+  <!-- Dados do cliente -->
+  <rect x="70" y="100" width="360" height="60" rx="5" ry="5" fill="#f8f9fa"/>
+  <text x="80" y="120" font-family="Arial" font-size="14" fill="#2b2d42" font-weight="bold">CLIENTE:</text>
+  <text x="150" y="120" font-family="Arial" font-size="14" fill="#2b2d42">João Silva</text>
+  <text x="80" y="140" font-family="Arial" font-size="14" fill="#2b2d42" font-weight="bold">ENDEREÇO:</text>
+  <text x="180" y="140" font-family="Arial" font-size="14" fill="#2b2d42">Rua das Flores, 123</text>
+  <text x="80" y="160" font-family="Arial" font-size="14" fill="#2b2d42" font-weight="bold">CONTATO:</text>
+  <text x="160" y="160" font-family="Arial" font-size="14" fill="#2b2d42">(21) 98765-4321</text>
+  
+  <!-- Tabela de itens -->
+  <rect x="70" y="170" width="360" height="30" rx="0" ry="0" fill="#e9ecef"/>
+  <text x="90" y="190" font-family="Arial" font-size="12" fill="#2b2d42" font-weight="bold">DESCRIÇÃO</text>
+  <text x="300" y="190" font-family="Arial" font-size="12" fill="#2b2d42" font-weight="bold">QTD</text>
+  <text x="350" y="190" font-family="Arial" font-size="12" fill="#2b2d42" font-weight="bold">VL. UNIT.</text>
+  <text x="410" y="190" font-family="Arial" font-size="12" fill="#2b2d42" font-weight="bold">TOTAL</text>
+  
+  <!-- Linha 1 -->
+  <line x1="70" y1="200" x2="430" y2="200" stroke="#dee2e6" stroke-width="1"/>
+  <text x="90" y="218" font-family="Arial" font-size="12" fill="#2b2d42">Instalação de ar condicionado</text>
+  <text x="300" y="218" font-family="Arial" font-size="12" fill="#2b2d42" text-anchor="middle">1</text>
+  <text x="350" y="218" font-family="Arial" font-size="12" fill="#2b2d42" text-anchor="middle">R$ 350,00</text>
+  <text x="410" y="218" font-family="Arial" font-size="12" fill="#2b2d42" text-anchor="middle">R$ 350,00</text>
+  
+  <!-- Linha 2 -->
+  <line x1="70" y1="225" x2="430" y2="225" stroke="#dee2e6" stroke-width="1"/>
+  <text x="90" y="243" font-family="Arial" font-size="12" fill="#2b2d42">Material de instalação</text>
+  <text x="300" y="243" font-family="Arial" font-size="12" fill="#2b2d42" text-anchor="middle">1</text>
+  <text x="350" y="243" font-family="Arial" font-size="12" fill="#2b2d42" text-anchor="middle">R$ 150,00</text>
+  <text x="410" y="243" font-family="Arial" font-size="12" fill="#2b2d42" text-anchor="middle">R$ 150,00</text>
+  
+  <!-- Linha 3 -->
+  <line x1="70" y1="250" x2="430" y2="250" stroke="#dee2e6" stroke-width="1"/>
+  <text x="90" y="268" font-family="Arial" font-size="12" fill="#2b2d42">Configuração e testes</text>
+  <text x="300" y="268" font-family="Arial" font-size="12" fill="#2b2d42" text-anchor="middle">1</text>
+  <text x="350" y="268" font-family="Arial" font-size="12" fill="#2b2d42" text-anchor="middle">R$ 120,00</text>
+  <text x="410" y="268" font-family="Arial" font-size="12" fill="#2b2d42" text-anchor="middle">R$ 120,00</text>
+  
+  <!-- Total -->
+  <rect x="70" y="275" width="360" height="35" rx="0" ry="0" fill="#4361ee" fill-opacity="0.1"/>
+  <text x="90" y="298" font-family="Arial" font-size="14" fill="#2b2d42" font-weight="bold">TOTAL</text>
+  <text x="410" y="298" font-family="Arial" font-size="14" fill="#4361ee" font-weight="bold" text-anchor="middle">R$ 620,00</text>
+  
+  <!-- Efeito de sombra ao redor do papel -->
+  <rect x="50" y="30" width="400" height="290" rx="10" ry="10" fill="none" stroke="#ddd" stroke-width="2"/>
+  
+  <!-- Efeito de dobra no canto -->
+  <path d="M430,30 L450,50 L450,30 Z" fill="#e9ecef"/>
+</svg> 
